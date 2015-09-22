@@ -5,23 +5,16 @@
   <link href="styles/app-theme.html" rel="import">
 
 
-  <link href="../paper-dropdown-menu/paper-dropdown-menu.html" rel="import">
-  <link href="../paper-menu/paper-menu.html" rel="import">
-  <link href="../paper-toolbar/paper-toolbar.html" rel="import">
-  <link href="../paper-tabs/paper-tab.html" rel="import">
-  <link href="../paper-tabs/paper-tabs.html" rel="import">
   <link href="../paper-material/paper-material.html" rel="import">
   <link href="../paper-item/paper-item.html" rel="import">
   <link href="../paper-progress/paper-progress.html" rel="import">
+  <link href="../paper-styles/paper-styles.html" rel="import">
 
   <link href="../iron-ajax/iron-ajax.html" rel="import">
   <link href="../iron-flex-layout/iron-flex-layout.html" rel="import">
 
-  <link href="wallcology-bugselector.html" rel="import">
-  <link href="graph-element.html" rel="import">
-
-  <!--D3-->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js" charset="utf-8"></script>
+  <link href="../wallcology-selector/wallcology-selector.html" rel="import">
+  <link href="history-graph.html" rel="import">
 </head>
 
 <dom-module id="population-app">
@@ -138,29 +131,17 @@
           <div class="vertical-section">
 
             <div class="horizontal layout">
-              <h3>Population History : <span>{{toUpperCase(currentHabitat.name)}}</span></h3>
-
               <div class="flex"></div>
-              <div>
-                <paper-dropdown-menu label="All Habitats">
-                  <paper-menu id="habitatMenu" class="dropdown-content" selected="{{selectedHabitatValue}}">
-                    <template is="dom-repeat" items="[[habitats]]" as="habitat">
-                      <paper-item>[[toUpperCase(habitat.name)]]</paper-item>
-                    </template>
-                  </paper-menu>
-                </paper-dropdown-menu>
-              </div>
             </div>
           </div>
           <div class="vertical-section">
-            <wallcology-bugselector selected-bugs="{{selectedBugs}}"
-                                    current-habitat="{{currentHabitat}}"></wallcology-bugselector>
+            <wallcology-selector max-selections="2" selected-bugs="{{selectedBugs}}"></wallcology-selector>
           </div>
 
 
           <template is="dom-repeat" items="{{selectedBugs}}">
             <div class="vertical-section-bug" id="bugs">
-              <graph-element bug="{{item}}"></graph-element>
+              <history-graph bug="{{item}}"></history-graph>
             </div>
           </template>
 

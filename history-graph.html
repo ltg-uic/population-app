@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <!--D3-->
+    <link rel="import" href="../google-chart/google-chart.html">
+    <link rel="import" href="../jv-datepicker.html">
+    <link rel="import" href="../jv-datepicker-dialog.html">
+</head>
+
+<dom-module id="history-graph">
+    <style>
+
+        :host {
+
+        }
+
+        .red {
+            background-color: red;
+        }
+
+        .yellow {
+            background-color: yellow;
+        }
+
+        .title {
+            left-margin: 10px;
+            font-size: 35px;
+        }
+
+        paper-menu {
+            display: block;
+        }
+
+        paper-dropdown-menu {
+            text-align: left;
+            margin: auto;
+            width: 125px;
+        }
+
+        paper-material {
+            background-color: white;;
+            height: 100%;
+            margin: 0px;
+            padding: 10px;
+        }
+
+        .vertical-section-container {
+            @apply(--layout-vertical);
+            @apply(--center-justified);
+        }
+
+        .horizontal-section-container {
+            @apply(--layout-horizontal);
+            @apply(--layout-center-justified);
+            @apply(--layout-wrap);
+        }
+
+        .horizontal-section {
+            background-color: white;
+            padding: 0px;
+            margin: 0 0px 0px 0px;
+
+            @apply(--shadow-elevation-2dp);
+        }
+
+        .vertical-section {
+            background-color: white;
+            padding: 0px;
+            margin: 0 0px 0px 0px;
+        }
+
+        .centre {
+            margin:0px auto;
+        }
+
+        google-chart {
+            height: 200px;
+            width: 100%;
+            background-color: yellow;
+            padding: 0px;
+            margin: 0px;
+        }
+
+        .subheading {
+            padding-left: 0px;
+        }
+
+        paper-button.colorful {
+            background: #4285f4;
+            color: #fff;
+        }
+
+        .spacer {
+            height: 10px;
+        }
+
+    </style>
+    <template>
+
+
+        <div class="vertical-section-container">
+            <div class="vertical-section"><h3 class="subheading">Population : <span>{{toUpperCase(bug)}}</span></h3>
+            </div>
+            <div class="vertical-section">
+                <paper-button id="start" on-tap="showStartDateDialogAction" class="colorful" raised>START DATE</paper-button><paper-button id="end" class="colorful"  on-tap="showEndDateDialogAction" raised>END DATE</paper-button>
+            </div>
+            <div class="vertical-section spacer">
+
+            </div>
+            <div class="vertical-section">
+                <!--<svg id="viz" width="1000" height="500"></svg>-->
+                <google-chart
+                        type='column'
+                        options='{"legend": "none"}'
+                        data='chart-data.json'>
+                </google-chart>
+
+
+                <!--<svg class="chart"></svg>-->
+
+            </div>
+        </div>
+
+
+        <!--Shadow DOM-->
+
+        <paper-dialog id="dateDialog" class="paper-date-picker-dialog" modal on-iron-overlay-closed="dismissDialogAction">
+            <div class="vertical-section-container">
+                <div class="vertical-section centre">
+                    <h2 id="dateHeading" class="subheading">{{dateHeadingLabel}}</span></h2>
+                </div>
+                <div class="vertical-section">
+                    <paper-date-picker id="dateOne"></paper-date-picker>
+                </div>
+            </div>
+            </div>
+            </div>
+
+            <div class="buttons">
+                <paper-button dialog-dismiss>Cancel</paper-button>
+                <paper-button id="okButton" on-tap="okAction" dialog-confirm>OK</paper-button>
+            </div>
+        </paper-dialog>
+    </template>
+    <script>
+        // element registration
+        Polymer({
+            is: 'history-graph',
+
+            // add properties and methods on the element's prototype
+            properties: {
+                // declare properties for the element's public API
+                data: {
+                    type: Array,
+                    notify: true,
+                    value: []
+                },
+                dateHeadingLabel: {
+                    type: String,
+                    notify: true,
+                    value: 'no label'
+                },
+                bug: {
+                    type: String,
+                    notify: true,
+                    value: '',
+                    observer: 'bugChanged'
+
+                }
+            },
+            showStartDateDialogAction: function (e) {
+                this.dateHeadingLabel = 'SELECT A START DATE:';
+
+                if( this.$.okButton.okAction !== undefined ) {
+                    this.$.okButton.okAc = function(e) {
+                        console.log('er');
+                    }
+                }
+
+
+
+                this.$.dateDialog.toggle();
+
+
+            },
+            showEndDateDialogAction: function (e) {
+                this.dateHeadingLabel = 'SELECT AN END DATE:';
+                this.$.dateDialog.toggle();
+            },
+            dismissDialogAction: function (e) {
+
+            },
+            bugChanged: function (newValue, oldValue) {
+                console.log('D3 BUG:', newValue, oldValue);
+            },
+            ready: function () {
+
+                this.createElements();
+                this.getData();
+
+            },
+            createElements: function () {
+                me = this;
+
+            },
+            drawChart: function () {
+
+            },
+            getData: function () {
+
+            },
+            refreshChart: function () {
+
+            },
+
+            toUpperCase: function (someString) {
+                if (someString !== undefined) {
+                    return someString.toUpperCase();
+                }
+                return null;
+            }
+        });
+    </script>
+</dom-module>

@@ -30,6 +30,10 @@ And you can run it via:
 Once running, you can preview your element at
 `http://localhost:8080/components/population-app/`, where `seed-element` is the name of the directory containing it.
 
+## To install in your app
+
+ `bower install https://github.com/ltg-uic/population-app.git --save`
+
 
 ## Testing Your Element
 
