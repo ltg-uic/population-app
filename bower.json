@@ -23,6 +23,7 @@
     "google-chart": "GoogleWebComponents/google-chart#^1.0.0",
     "iron-ajax": "PolymerElements/iron-ajax#1.0.0",
     "iron-flex-layout": "PolymerElements/iron-flex-layout#^1.0.0",
+    "iron-iconset": "PolymerElements/iron-iconset#^1.0.0",
     "jv-datepicker": "motss/jv-datepicker#~1.4.15",
     "neon-animation": "polymerelements/neon-animation#^1.0.0",
     "paper-button": "PolymerElements/paper-button#^1.0.0",

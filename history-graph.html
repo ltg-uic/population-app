@@ -3,8 +3,10 @@
 <head>
     <!--D3-->
     <link rel="import" href="../google-chart/google-chart.html">
-    <link rel="import" href="../jv-datepicker.html">
-    <link rel="import" href="../jv-datepicker-dialog.html">
+    <link rel="import" href="../jv-datepicker/jv-datepicker.html">
+    <link rel="import" href="../jv-datepicker/jv-datepicker-dialog.html">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.6/moment.min.js" charset="utf-8"></script>
+
 </head>
 
 <dom-module id="history-graph">
@@ -22,9 +24,12 @@
             background-color: yellow;
         }
 
-        .title {
-            left-margin: 10px;
-            font-size: 35px;
+
+
+        .error {
+            margin: 10px;
+            font-size: 20px;
+            color: var(--paper-red-700);;
         }
 
         paper-menu {
@@ -76,7 +81,7 @@
         google-chart {
             height: 200px;
             width: 100%;
-            background-color: yellow;
+            background-color: #ffffff;
             padding: 0px;
             margin: 0px;
         }
@@ -102,18 +107,21 @@
             <div class="vertical-section"><h3 class="subheading">Population : <span>{{toUpperCase(bug)}}</span></h3>
             </div>
             <div class="vertical-section">
-                <paper-button id="start" on-tap="showStartDateDialogAction" class="colorful" raised>START DATE</paper-button><paper-button id="end" class="colorful"  on-tap="showEndDateDialogAction" raised>END DATE</paper-button>
+                <paper-button id="startDateButton" on-tap="showStartDateDialogAction" class="colorful" raised><span>{{startDate}}</span></paper-button>
+                <paper-button id="endDateButton" class="colorful"  on-tap="showEndDateDialogAction" raised><span>{{endDate}}</span></paper-button>
+                <div id="errorTag" hidden="true" class="error"><span>{{errorMessage}}</span></div>
             </div>
             <div class="vertical-section spacer">
 
             </div>
             <div class="vertical-section">
                 <!--<svg id="viz" width="1000" height="500"></svg>-->
-                <google-chart
+                <google-chart id="chart" hidden="true"
                         type='column'
                         options='{"legend": "none"}'
-                        data='chart-data.json'>
+                        data={{data}}>
                 </google-chart>
+
 
 
                 <!--<svg class="chart"></svg>-->
@@ -121,26 +129,9 @@
             </div>
         </div>
 
+        <jv-datepicker-dialog id="startDateDialog" modal format="mm-dd-yyyy" bind-date="{{startDate}}" on-format-date="" start-day=""></jv-datepicker-dialog>
+        <jv-datepicker-dialog id="endDateDialog" modal format="mm-dd-yyyy" bind-date="{{endDate}}" on-format-date="" start-day=""></jv-datepicker-dialog>
 
-        <!--Shadow DOM-->
-
-        <paper-dialog id="dateDialog" class="paper-date-picker-dialog" modal on-iron-overlay-closed="dismissDialogAction">
-            <div class="vertical-section-container">
-                <div class="vertical-section centre">
-                    <h2 id="dateHeading" class="subheading">{{dateHeadingLabel}}</span></h2>
-                </div>
-                <div class="vertical-section">
-                    <paper-date-picker id="dateOne"></paper-date-picker>
-                </div>
-            </div>
-            </div>
-            </div>
-
-            <div class="buttons">
-                <paper-button dialog-dismiss>Cancel</paper-button>
-                <paper-button id="okButton" on-tap="okAction" dialog-confirm>OK</paper-button>
-            </div>
-        </paper-dialog>
     </template>
     <script>
         // element registration
@@ -153,12 +144,37 @@
                 data: {
                     type: Array,
                     notify: true,
-                    value: []
+                    value: function() {
+                        return [
+                            [
+                                'Day',
+                                'Count'
+
+                            ],
+                            [
+                                moment().format('MM-DD-YYYY'),
+                                10
+
+                            ]
+                        ]
+                    }
                 },
-                dateHeadingLabel: {
+
+                startDate: {
                     type: String,
                     notify: true,
-                    value: 'no label'
+                    value: function() {
+                        return moment().format('MM-DD-YYYY');
+                    },
+                    observer: 'startDateChanged'
+                },
+                endDate: {
+                    type: String,
+                    notify: true,
+                    value: function() {
+                        return moment().format('MM-DD-YYYY');
+                    },
+                    observer: 'endDateChanged'
                 },
                 bug: {
                     type: String,
@@ -168,27 +184,89 @@
 
                 }
             },
-            showStartDateDialogAction: function (e) {
-                this.dateHeadingLabel = 'SELECT A START DATE:';
+            startDateChanged: function(newValue, oldValue) {
+                if( this.endDate !== undefined ) {
+                    if (moment(newValue).isSame(this.endDate) === true) {
+                        this.$.chart.hidden = false;
+                        this.$.errorTag.hidden = true;
+                        this.data = [
+                            [
+                                'Day',
+                                'Count'
 
-                if( this.$.okButton.okAction !== undefined ) {
-                    this.$.okButton.okAc = function(e) {
-                        console.log('er');
+                            ],
+                            [
+                                moment().format('MM-DD-YYYY'),
+                                10
+
+                            ]
+                        ];
+                    } else if (moment(newValue).isBefore(this.endDate) !== true) {
+                        this.$.chart.hidden = true;
+                        this.$.errorTag.hidden = false;
+                        this.errorMessage = newValue + ' cannot come before ' + this.endDate;
+                    } else {
+                        this.$.chart.hidden = false;
+                        this.$.errorTag.hidden = true;
                     }
+                } else {
+                    this.$.chart.hidden = false;
+                    this.$.errorTag.hidden = true;
                 }
 
+                this.recalcGraph();
+            },
+            endDateChanged: function(newValue, oldValue) {
+                if( this.startDate !== undefined ) {
+                    if (moment(newValue).isSame(this.startDate) === true) {
+                        this.$.chart.hidden = false;
+                        this.$.errorTag.hidden = true;
+                    } else if (moment(newValue).isAfter(this.startDate) !== true) {
+                        this.$.chart.hidden = true;
+                        this.$.errorTag.hidden = false;
+                        this.errorMessage = newValue + ' cannot come after ' + this.startDate;
+                    } else {
+                        this.$.chart.hidden = false;
+                        this.$.errorTag.hidden = true;
+                    }
+                } else {
+                    this.$.chart.hidden = false;
+                    this.$.errorTag.hidden = true;
+                }
+
+                this.recalcGraph();
+            },
+            recalcGraph: function() {
+                var a = moment(this.startDate);
+                var b = moment(this.endDate);
+                var diff = b.diff(a, 'days')
+
+                if( diff > 0 ) {
 
 
-                this.$.dateDialog.toggle();
+                    var t = [
+                        [
+                            'Day',
+                            'Count'
 
+                        ]];
 
+                    for( var i = 0; i < diff; i++ ){
+                        var d = this.startDate;
+                        var j = moment(d,'MM-DD');
+                        var k =  j.add(i+1, 'd');
+                        t.push([k.format('MM-DD'), Math.floor(Math.random() * 40) + 1  ]);
+                    }
+
+                    this.data = t;
+                }
+
+            },
+            showStartDateDialogAction: function (e) {
+                this.$.startDateDialog.toggle();
             },
             showEndDateDialogAction: function (e) {
-                this.dateHeadingLabel = 'SELECT AN END DATE:';
-                this.$.dateDialog.toggle();
-            },
-            dismissDialogAction: function (e) {
-
+                this.$.endDateDialog.toggle();
             },
             bugChanged: function (newValue, oldValue) {
                 console.log('D3 BUG:', newValue, oldValue);
@@ -211,6 +289,9 @@
             },
             refreshChart: function () {
 
+            },
+            formatDate: function(date) {
+              return moment(date, 'MMM DD YYYY');
             },
 
             toUpperCase: function (someString) {
