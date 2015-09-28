@@ -27,8 +27,6 @@
             background-color: yellow;
         }
 
-
-
         .error {
             margin: 10px;
             font-size: 20px;
@@ -67,8 +65,6 @@
             background-color: white;
             padding: 0px;
             margin: 0 0px 0px 0px;
-
-            @apply(--shadow-elevation-2dp);
         }
 
         .vertical-section {
@@ -78,7 +74,7 @@
         }
 
         .centre {
-            margin:0px auto;
+            margin: 0px auto;
         }
 
         .subheading {
@@ -106,45 +102,56 @@
             padding: 0px;
             margin: 0px;
         }
+
+        .bug {
+            --iron-icon-height: 60px;
+            --iron-icon-width: 60px;
+        }
+
     </style>
     <template>
 
-        <nutella-client connected={{connected}} id="nutellaConn" host="127.0.0.1" appid="wallcology" runid="default" componentid="wallcology_admin"></nutella-client>
+        <nutella-client connected={{connected}} id="nutellaConn" host="127.0.0.1" appid="wallcology" runid="default"
+                        componentid="wallcology_admin"></nutella-client>
 
         <div class="vertical-section-container">
             <div class="vertical-section">
-                <wallcology-selector  toggle-selectors="{{toggleSelectors}}" button-selectors={{buttonSelectors}}
-                                      max-selections="2" selected-items="{{selectedItems}}" current-toggle="{{currentToggle}}"></wallcology-selector>
+                <wallcology-selector toggle-selectors="{{toggleSelectors}}" button-selectors={{buttonSelectors}}
+                                     max-selections="2" selected-items="{{selectedItems}}"
+                                     current-toggle="{{currentToggle}}"></wallcology-selector>
             </div>
             <div class="vertical-section hspacer red">
-                <paper-button id="startDateButton" on-tap="showStartDateDialogAction" class="colorful"><span>{{startDate}}</span></paper-button>
-                <paper-button id="endDateButton" class="colorful spacer"  on-tap="showEndDateDialogAction"><span>{{endDate}}</span></paper-button>
+                <paper-button id="startDateButton" on-tap="showStartDateDialogAction" class="colorful"><span>{{startDate}}</span>
+                </paper-button>
+                <paper-button id="endDateButton" class="colorful spacer" on-tap="showEndDateDialogAction"><span>{{endDate}}</span>
+                </paper-button>
                 <div id="errorTag" hidden="true" class="error"><span>{{errorMessage}}</span></div>
             </div>
         </div>
 
-        <div class="vertical-section-container">
+
             <template is="dom-repeat" items="{{graphs}}">
-                <div class="vertical-section">
-                    <!--<div class="horizontal layout">-->
-                        <!--<div class="red">-->
-                            <!--<paper-icon-button  disabled id="{{index}}"  on-tap="buttonTapped"  src="{{item.imgUrl}}" class="bug selector"></paper-icon-button>-->
-                        <!--</div>-->
-                        <div class="flex">
-                            <google-chart id="{{chartName(item.index)}}"
-                                          type='column'
-                                          options='{"legend": "none"}'
-                                          data={{item.data}}>
-                            </google-chart>
-                        </div>
-                    <!--</div>-->
+                <div class="horizontal-section-container">
+                <div class="horizontal layout center">
+                <paper-icon-button toggles disabled  on-tap="buttonTapped"  src="{{item.imgUrl}}" class="bug"></paper-icon-button>
+                </div>
+                <div class="horizontal-section flex center">
+                    <google-chart id="{{chartName(item.index)}}"
+                                  type='column'
+                                  options='{{item.options}}'
+                                  data={{item.data}}>
+                    </google-chart>
+
+                </div>
                 </div>
             </template>
         </div>
 
 
-        <jv-datepicker-dialog id="startDateDialog" modal format="mm-dd-yyyy" bind-date="{{startDate}}" on-format-date="" start-day=""></jv-datepicker-dialog>
-        <jv-datepicker-dialog id="endDateDialog" modal format="mm-dd-yyyy" bind-date="{{endDate}}" on-format-date="" start-day=""></jv-datepicker-dialog>
+        <jv-datepicker-dialog id="startDateDialog" modal format="mm-dd-yyyy" bind-date="{{startDate}}" on-format-date=""
+                              start-day=""></jv-datepicker-dialog>
+        <jv-datepicker-dialog id="endDateDialog" modal format="mm-dd-yyyy" bind-date="{{endDate}}" on-format-date=""
+                              start-day=""></jv-datepicker-dialog>
 
 
     </template>
@@ -183,10 +190,34 @@
                     notify: true,
                     value: []
                 },
+                chartOptions: {
+                    type: Object,
+                    notify: true,
+                    value: {
+                        legend: {position: 'none'},
+                        viewWindow: {
+                            min: new Date(2014, 11, 31, 18),
+                            max: new Date(2015, 0, 3, 1)
+                        },
+                        hAxis: {
+                            gridlines: {
+                                count: -1,
+                                units: {
+                                    days: {format: ['MMM dd']},
+                                }
+                            },
+                            minorGridlines: {
+                                units: {
+                                    hours: {format: ['hh:mm:ss a', 'ha']},
+                                    minutes: {format: ['HH:mm a Z', ':mm']}}
+                            }
+                        }
+                    }
+                },
                 startDate: {
                     type: String,
                     notify: true,
-                    value: function() {
+                    value: function () {
                         return moment().format('MM-DD-YYYY').toString();
                     },
                     observer: 'startDateChanged'
@@ -194,7 +225,7 @@
                 endDate: {
                     type: String,
                     notify: true,
-                    value: function() {
+                    value: function () {
                         return moment().format('MM-DD-YYYY').toString();
                     },
                     observer: 'endDateChanged'
@@ -217,20 +248,16 @@
 
                     var is = changeRecord.base.splices.indexSplices[0];
 
-                    if( is.addedCount > 0 ) {
+                    if (is.addedCount > 0) {
                         var l = changeRecord.base.length;
-                        var species = changeRecord.base[l-1];
-                        console.log('we added', species);
-                        var habitat = this.currentToggle.index;
-                        var sdate = moment(this.startDate,'MM-DD-YYYY').valueOf();
-                        var edate = moment(this.endDate,'MM-DD-YYYY').valueOf();
-                        this.addHistoryGraph(species,habitat, sdate, edate,species);
-                    } else if( is.removed[0] !== undefined ) {
+                        var species = changeRecord.base[l - 1];
+                        this.updateGraph(species);
+                    } else if (is.removed[0] !== undefined) {
                         var species = is.removed[0];
-                        for( var i = 0; i < this.graphs.length; i++) {
-                             var g = this.graphs[i];
-                            if(g.index === species.index) {
-                                this.splice('graphs',i,1);
+                        for (var i = 0; i < this.graphs.length; i++) {
+                            var g = this.graphs[i];
+                            if (g.index === species.index) {
+                                this.splice('graphs', i, 1);
                             }
                         }
 
@@ -243,34 +270,36 @@
 
                 }
             },
-            toggleSelectorsChanged: function(changeRecord){
+            toggleSelectorsChanged: function (changeRecord) {
 
             },
             buttonSelectorsChanged: function (changeRecord) {
 
             },
-            currentToggleChanged: function(newValue, oldValue){
+            currentToggleChanged: function (newValue, oldValue) {
                 console.log('toggle changed test-app', newValue, oldValue);
             },
-            startDateChanged: function(newValue, oldValue) {
-                if( this.endDate !== undefined ) {
+            startDateChanged: function (newValue, oldValue) {
+                if (this.endDate !== undefined) {
                     if (moment(newValue).isSame(this.endDate) === true) {
                         this.$.errorTag.hidden = true;
                     } else if (moment(newValue).isBefore(this.endDate) !== true) {
                         this.$.errorTag.hidden = false;
                         this.errorMessage = newValue + ' cannot come before ' + this.endDate;
+                        return;
                     } else {
                         this.$.errorTag.hidden = true;
                     }
                 } else {
                     this.$.errorTag.hidden = true;
                 }
+                this.updateAllGraphs()
             },
-            endDateChanged: function(newValue, oldValue) {
-                if( this.startDate !== undefined ) {
-                    if (moment(newValue,'MM-DD-YYYY').isSame(this.startDate) === true) {
+            endDateChanged: function (newValue, oldValue) {
+                if (this.startDate !== undefined) {
+                    if (moment(newValue, 'MM-DD-YYYY').isSame(this.startDate) === true) {
                         this.$.errorTag.hidden = true;
-                    } else if (moment(newValue,'MM-DD-YYYY').isAfter(this.startDate) !== true) {
+                    } else if (moment(newValue, 'MM-DD-YYYY').isAfter(this.startDate) !== true) {
                         this.$.errorTag.hidden = false;
                         this.errorMessage = newValue + ' cannot come after ' + this.startDate;
                         return;
@@ -281,8 +310,21 @@
                     this.$.errorTag.hidden = true;
                 }
 
-                //query nutella
 
+                //update all the graph objects with new date for this date range
+                this.updateAllGraphs()
+            },
+            updateGraph: function (species) {
+                var sdate = moment(this.startDate, 'MM-DD-YYYY').valueOf();
+                var edate = moment(this.endDate, 'MM-DD-YYYY').valueOf();
+                var habitatIndex = this.currentToggle.index;
+                this.addHistoryGraph(species, habitatIndex, sdate, edate);
+            },
+            updateAllGraphs: function () {
+                for (var i = 0; i < this.selectedItems.length; i++) {
+                    var species = this.selectedItems[i];
+                    this.updateGraph(species);
+                }
             },
             showStartDateDialogAction: function (e) {
                 this.$.startDateDialog.toggle();
@@ -290,40 +332,73 @@
             showEndDateDialogAction: function (e) {
                 this.$.endDateDialog.toggle();
             },
-            addHistoryGraph: function(species, habitat, sdate, edate) {
+            addHistoryGraph: function (species, habitatIndex, sdate, edate) {
                 var me = this;
-                var meSpecies = species;
                 var edate = moment(edate).endOf('day').valueOf();
-                var h = { habitat: habitat, species: meSpecies.index, from: sdate, to: edate};
+                var h = {habitat: habitatIndex, species: species.index, points: 25, from: sdate, to: edate};
                 console.log(h);
-                this.$.nutellaConn.nutella.net.request('population_history', h, function(response) {
-
-                    console.log('response: ',response);
+                this.$.nutellaConn.nutella.net.request('population_history', h, function (response) {
+                    var r = response;
+                    console.log('response: ', r);
                     var t = [
-                        [
-                            'Time',
-                            'Count'
 
-                        ]];
+                        [{label: 'Days', type: 'date'}, {label: 'Counts', type: 'number'}]
 
 
-                    for (var i=0; i<r.length; i++) {
-                        t.push([moment("/Date("+ r[i].timestamp+")/").format('dddd, MMMM Do YYYY, h:mm:ss a'), r[i].population]);
+                    ];
+
+
+                    for (var i = 0; i < r.length; i++) {
+                        //t.push([r[i].timestamp, r[i].population]);
+                        // var d = moment("/Date(" + r[i].timestamp + ")/").isocalendar();
+                        var d = 'Date(' + moment(r[i].timestamp) + ')';
+
+                        //console.log('new date', d);
+
+                        t.push([d, r[i].population]);
+
+                        //t.push([moment("/Date(" + r[i].timestamp + ")/"), r[i].population]);
                     }
 
-                    var g = { index: sIndex, data: t, imgUrl: meSpecies.imgUrl };
-                    me.push('graphs', g);
-//                    console.log('response formated: ',s);
-                    console.log('pushed graph');
+                    //if it exists already
+                    var found = false;
+                    if (me.graphs[0] !== undefined) {
+                        for (var i = 0; i < me.graphs.length; i++) {
+                            var g = me.graphs[i];
+                            if (g !== undefined && g.index === species.index) {
+                                found = true;
+                                g.data = t;
+                                g.options = me.chartOptions;
+                                g.options.viewWindow.min = t[1][0];
+                                g.options.viewWindow.max = t[t.length-1][0];
+                                me.redrawChart(g.index);
+                                console.log('updated graph')
+                            }
+                        }
+                    }
+
+                    if (found === false) {
+                        var g = {index: species.index, data: t, imgUrl: species.imgUrl};
+                        g.options = me.chartOptions;
+                        g.options.viewWindow.min = t[1][0];
+                        g.options.viewWindow.max = t[t.length-1][0];
+                        me.push('graphs', g);
+                        console.log('pushed graph');
+                    }
                 });
 
+            },
+            redrawChart: function(index) {
+                var chartId =  this.chartName(index);
+                var chart = document.getElementById(chartId);
+                chart.drawChart();
             },
             connectedChanged: function (newValue, oldValue) {
                 var me = this;
                 console.log('connected changed', newValue, oldValue);
-                if( newValue === true ) {
-                    this.$.nutellaConn.nutella.net.request('master_configuration', {}, function(r){
-                        if( r !== undefined ) {
+                if (newValue === true) {
+                    this.$.nutellaConn.nutella.net.request('master_configuration', {}, function (r) {
+                        if (r !== undefined) {
                             me.buttonSelectors = r.habitatItems;
 
                             var start = [{
@@ -347,7 +422,7 @@
             },
             chartName: function (index) {
                 console.log('graph ' + index);
-                return 'chart-'+index;
+                return 'chart-' + index;
             }
         });
     </script>
