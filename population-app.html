@@ -2,33 +2,149 @@
 <head>
     <link href="./bower_components/polymer/polymer.html" rel="import">
 
+    <link rel="import" href="./bower_components/google-chart/google-chart.html">
 
     <link href="./bower_components/wallcology-selector/wallcology-selector.html" rel="import">
+    <link rel="import" href="./bower_components/jv-datepicker/jv-datepicker.html">
+    <link rel="import" href="./bower_components/jv-datepicker/jv-datepicker-dialog.html">
     <link href="nutella-client.html" rel="import">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.6/moment.min.js" charset="utf-8"></script>
+
 
 </head>
 
 <dom-module id="population-app">
     <style>
+        :host {
 
+        }
+
+        .red {
+            background-color: red;
+        }
+
+        .yellow {
+            background-color: yellow;
+        }
+
+
+
+        .error {
+            margin: 10px;
+            font-size: 20px;
+            color: var(--paper-red-700);;
+        }
+
+        paper-menu {
+            display: block;
+        }
+
+        paper-dropdown-menu {
+            text-align: left;
+            margin: auto;
+            width: 125px;
+        }
+
+        paper-material {
+            background-color: white;;
+            height: 100%;
+            margin: 0px;
+            padding: 10px;
+        }
+
+        .vertical-section-container {
+            @apply(--layout-vertical);
+            @apply(--center-justified);
+        }
+
+        .horizontal-section-container {
+            @apply(--layout-horizontal);
+            @apply(--layout-center-justified);
+            @apply(--layout-wrap);
+        }
+
+        .horizontal-section {
+            background-color: white;
+            padding: 0px;
+            margin: 0 0px 0px 0px;
+
+            @apply(--shadow-elevation-2dp);
+        }
+
+        .vertical-section {
+            background-color: white;
+            padding: 0px;
+            margin: 0 0px 0px 0px;
+        }
+
+        .centre {
+            margin:0px auto;
+        }
+
+        .subheading {
+            padding-left: 0px;
+        }
+
+        paper-button.colorful {
+            color: white;
+            background: var(--paper-blue-500);
+            @apply(--shadow-elevation-0dp);
+        }
+
+        .vspacer {
+            height: 10px;
+        }
+
+        .hspacer {
+            margin-left: 5px;
+        }
+
+        google-chart {
+            height: 200px;
+            width: 100%;
+            background-color: #ffffff;
+            padding: 0px;
+            margin: 0px;
+        }
     </style>
     <template>
 
-        <nutella-client id="nutellaConn" host="127.0.0.1" appid="wallcology" runid="default" componentid="wallcology_admin"></nutella-client>
+        <nutella-client connected={{connected}} id="nutellaConn" host="127.0.0.1" appid="wallcology" runid="default" componentid="wallcology_admin"></nutella-client>
 
-        <wallcology-selector  toggle-selectors="{{toggleSelectors}}" button-selectors={{buttonSelectors}}
-                             max-selections="2" selected-items="{{selectedItems}}" current-toggle="{{currentToggle}}"></wallcology-selector>
+        <div class="vertical-section-container">
+            <div class="vertical-section">
+                <wallcology-selector  toggle-selectors="{{toggleSelectors}}" button-selectors={{buttonSelectors}}
+                                      max-selections="2" selected-items="{{selectedItems}}" current-toggle="{{currentToggle}}"></wallcology-selector>
+            </div>
+            <div class="vertical-section hspacer red">
+                <paper-button id="startDateButton" on-tap="showStartDateDialogAction" class="colorful"><span>{{startDate}}</span></paper-button>
+                <paper-button id="endDateButton" class="colorful spacer"  on-tap="showEndDateDialogAction"><span>{{endDate}}</span></paper-button>
+                <div id="errorTag" hidden="true" class="error"><span>{{errorMessage}}</span></div>
+            </div>
+        </div>
+
+        <div class="vertical-section-container">
+            <template is="dom-repeat" items="{{graphs}}">
+                <div class="vertical-section">
+                    <!--<div class="horizontal layout">-->
+                        <!--<div class="red">-->
+                            <!--<paper-icon-button  disabled id="{{index}}"  on-tap="buttonTapped"  src="{{item.imgUrl}}" class="bug selector"></paper-icon-button>-->
+                        <!--</div>-->
+                        <div class="flex">
+                            <google-chart id="{{chartName(item.index)}}"
+                                          type='column'
+                                          options='{"legend": "none"}'
+                                          data={{item.data}}>
+                            </google-chart>
+                        </div>
+                    <!--</div>-->
+                </div>
+            </template>
+        </div>
 
 
-
-        <div>currentToggle:<span>{{currentToggle.name}}</span></div>
-
-
-        <div>selectedButtons
-        <template is="dom-repeat" items="{{selectedItems}}">
-            <span>{{item}}</span>
-        </template></div>
-
+        <jv-datepicker-dialog id="startDateDialog" modal format="mm-dd-yyyy" bind-date="{{startDate}}" on-format-date="" start-day=""></jv-datepicker-dialog>
+        <jv-datepicker-dialog id="endDateDialog" modal format="mm-dd-yyyy" bind-date="{{endDate}}" on-format-date="" start-day=""></jv-datepicker-dialog>
 
 
     </template>
@@ -61,7 +177,34 @@
                     type: Array,
                     notify: true,
                     value: []
-                }
+                },
+                graphs: {
+                    type: Array,
+                    notify: true,
+                    value: []
+                },
+                startDate: {
+                    type: String,
+                    notify: true,
+                    value: function() {
+                        return moment().format('MM-DD-YYYY').toString();
+                    },
+                    observer: 'startDateChanged'
+                },
+                endDate: {
+                    type: String,
+                    notify: true,
+                    value: function() {
+                        return moment().format('MM-DD-YYYY').toString();
+                    },
+                    observer: 'endDateChanged'
+                },
+                connected: {
+                    type: Boolean,
+                    notify: true,
+                    value: false,
+                    observer: 'connectedChanged'
+                },
             },
             observers: [
                 'selectedItemsChanged(selectedItems.*)',
@@ -69,7 +212,29 @@
                 'buttonSelectorsChanged(buttonSelectors.*)'
             ],
             selectedItemsChanged: function (changeRecord) {
+
                 if (changeRecord.path == 'selectedItems.splices') {
+
+                    var is = changeRecord.base.splices.indexSplices[0];
+
+                    if( is.addedCount > 0 ) {
+                        var l = changeRecord.base.length;
+                        var species = changeRecord.base[l-1];
+                        console.log('we added', species);
+                        var habitat = this.currentToggle.index;
+                        var sdate = moment(this.startDate,'MM-DD-YYYY').valueOf();
+                        var edate = moment(this.endDate,'MM-DD-YYYY').valueOf();
+                        this.addHistoryGraph(species,habitat, sdate, edate,species);
+                    } else if( is.removed[0] !== undefined ) {
+                        var species = is.removed[0];
+                        for( var i = 0; i < this.graphs.length; i++) {
+                             var g = this.graphs[i];
+                            if(g.index === species.index) {
+                                this.splice('graphs',i,1);
+                            }
+                        }
+
+                    }
                     // a user was added or removed
                 } else {
                     // an individual user or its sub-properties changed
@@ -87,26 +252,102 @@
             currentToggleChanged: function(newValue, oldValue){
                 console.log('toggle changed test-app', newValue, oldValue);
             },
+            startDateChanged: function(newValue, oldValue) {
+                if( this.endDate !== undefined ) {
+                    if (moment(newValue).isSame(this.endDate) === true) {
+                        this.$.errorTag.hidden = true;
+                    } else if (moment(newValue).isBefore(this.endDate) !== true) {
+                        this.$.errorTag.hidden = false;
+                        this.errorMessage = newValue + ' cannot come before ' + this.endDate;
+                    } else {
+                        this.$.errorTag.hidden = true;
+                    }
+                } else {
+                    this.$.errorTag.hidden = true;
+                }
+            },
+            endDateChanged: function(newValue, oldValue) {
+                if( this.startDate !== undefined ) {
+                    if (moment(newValue,'MM-DD-YYYY').isSame(this.startDate) === true) {
+                        this.$.errorTag.hidden = true;
+                    } else if (moment(newValue,'MM-DD-YYYY').isAfter(this.startDate) !== true) {
+                        this.$.errorTag.hidden = false;
+                        this.errorMessage = newValue + ' cannot come after ' + this.startDate;
+                        return;
+                    } else {
+                        this.$.errorTag.hidden = true;
+                    }
+                } else {
+                    this.$.errorTag.hidden = true;
+                }
+
+                //query nutella
+
+            },
+            showStartDateDialogAction: function (e) {
+                this.$.startDateDialog.toggle();
+            },
+            showEndDateDialogAction: function (e) {
+                this.$.endDateDialog.toggle();
+            },
+            addHistoryGraph: function(species, habitat, sdate, edate) {
+                var me = this;
+                var meSpecies = species;
+                var edate = moment(edate).endOf('day').valueOf();
+                var h = { habitat: habitat, species: meSpecies.index, from: sdate, to: edate};
+                console.log(h);
+                this.$.nutellaConn.nutella.net.request('population_history', h, function(response) {
+
+                    console.log('response: ',response);
+                    var t = [
+                        [
+                            'Time',
+                            'Count'
+
+                        ]];
+
+
+                    for (var i=0; i<r.length; i++) {
+                        t.push([moment("/Date("+ r[i].timestamp+")/").format('dddd, MMMM Do YYYY, h:mm:ss a'), r[i].population]);
+                    }
+
+                    var g = { index: sIndex, data: t, imgUrl: meSpecies.imgUrl };
+                    me.push('graphs', g);
+//                    console.log('response formated: ',s);
+                    console.log('pushed graph');
+                });
+
+            },
+            connectedChanged: function (newValue, oldValue) {
+                var me = this;
+                console.log('connected changed', newValue, oldValue);
+                if( newValue === true ) {
+                    this.$.nutellaConn.nutella.net.request('master_configuration', {}, function(r){
+                        if( r !== undefined ) {
+                            me.buttonSelectors = r.habitatItems;
+
+                            var start = [{
+                                'items': [],
+                                'name': 'Habitat ?  ',
+                                'index': -1
+                            }];
+                            me.toggleSelectors = start.concat(r.habitats);
+                            console.log('MASTER CONFIG FETCHED');
+
+                        }
+
+                    });
+                }
+            },
             ready: function () {
                 this.selectedItems = [];
                 this.buttonSelectors = [];
                 this.toggleSelectors = [];
-                var me = this;
-                this.$.nutellaConn.nutella.net.request('master_configuration', {}, function(r){
-                    if( r !== undefined ) {
-                        me.buttonSelectors = r.habitatItems;
 
-                        var start = [{
-                            'items': [],
-                            'name': 'Habitat ?  ',
-                            'index': -1
-                        }];
-                        me.toggleSelectors = start.concat(r.habitats);
-                        console.log('MASTER CONFIG CALLED BITCH', r.habitats);
-
-                    }
-
-                });
+            },
+            chartName: function (index) {
+                console.log('graph ' + index);
+                return 'chart-'+index;
             }
         });
     </script>
