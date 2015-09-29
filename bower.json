@@ -20,22 +20,21 @@
     "/demo/"
   ],
   "dependencies": {
-    "google-chart": "GoogleWebComponents/google-chart#^1.0.0",
-    "iron-ajax": "PolymerElements/iron-ajax#1.0.0",
-    "iron-flex-layout": "PolymerElements/iron-flex-layout#^1.0.0",
-    "iron-iconset": "PolymerElements/iron-iconset#^1.0.0",
+    "google-chart": "GoogleWebComponents/google-chart#^1.0.3",
+    "iron-flex-layout": "PolymerElements/iron-flex-layout#^1.0.2",
+    "iron-iconset": "PolymerElements/iron-iconset#^1.0.2",
     "jv-datepicker": "motss/jv-datepicker#~1.4.15",
-    "neon-animation": "polymerelements/neon-animation#^1.0.0",
-    "paper-button": "PolymerElements/paper-button#^1.0.0",
-    "paper-item": "PolymerElements/paper-item#^1.0.0",
-    "paper-material": "PolymerElements/paper-material#^1.0.0",
-    "paper-progress": "PolymerElements/paper-progress#^1.0.0",
-    "paper-styles": "PolymerElements/paper-styles#^1.0.0",
-    "polymer": "Polymer/polymer#^1.1.3",
-    "wallcology-selector": "https://github.com/ltg-uic/wallcology-selector.git"
+    "neon-animation": "polymerelements/neon-animation#^1.0.6",
+    "paper-button": "PolymerElements/paper-button#^1.0.7",
+    "paper-item": "PolymerElements/paper-item#^1.0.3",
+    "paper-material": "PolymerElements/paper-material#^1.0.2",
+    "paper-progress": "PolymerElements/paper-progress#^1.0.6",
+    "paper-styles": "PolymerElements/paper-styles#^1.0.11",
+    "polymer": "Polymer/polymer#^1.1.4",
+    "wallcology-selector": "https://github.com/ltg-uic/wallcology-selector.git",
+    "nutella-connector": "https://github.com/ltg-uic/nutella-connector.git"
   },
   "devDependencies": {
-    "iron-component-page": "PolymerElements/iron-component-page#^1.0.0",
     "web-component-tester": "*"
   },
   "repository": {

@@ -1,13 +1,13 @@
 <html>
 <head>
-    <link href="./bower_components/polymer/polymer.html" rel="import">
+    <link href="../polymer/polymer.html" rel="import">
 
-    <link rel="import" href="./bower_components/google-chart/google-chart.html">
+    <link  href="../google-chart/google-chart.html" rel="import">
 
-    <link href="./bower_components/wallcology-selector/wallcology-selector.html" rel="import">
-    <link rel="import" href="./bower_components/jv-datepicker/jv-datepicker.html">
-    <link rel="import" href="./bower_components/jv-datepicker/jv-datepicker-dialog.html">
-    <link href="nutella-client.html" rel="import">
+    <link href="../wallcology-selector/wallcology-selector.html" rel="import">
+    <link href="../nutella-connector/nutella-connector.html" rel="import">
+    <link href="../jv-datepicker/jv-datepicker.html" rel="import" >
+    <link href="../jv-datepicker/jv-datepicker-dialog.html" rel="import">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.6/moment.min.js" charset="utf-8"></script>
 
 
@@ -111,8 +111,8 @@
     </style>
     <template>
 
-        <nutella-client connected={{connected}} id="nutellaConn" host="127.0.0.1" appid="wallcology" runid="default"
-                        componentid="wallcology_admin"></nutella-client>
+        <nutella-connector connected={{connected}} id="nutellaConn" host="127.0.0.1" appid="wallcology" runid="default"
+                        componentid="wallcology_admin"></nutella-connector>
 
         <div class="vertical-section-container">
             <div class="vertical-section">
