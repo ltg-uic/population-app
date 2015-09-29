@@ -10,9 +10,16 @@ install that via:
 
     npm install -g bower
 
-Then, go ahead and download the element's dependencies:
+
+Steps:
+1. Then, go ahead and download the element's dependencies:
 
     bower install
+    
+    
+2.  then in bower_components > nutella-connector do:
+ 
+     npm 
 
 
 ## Playing With Your Element
@@ -28,14 +35,10 @@ And you can run it via:
     polyserve
 
 Once running, you can preview your element at
-`http://localhost:8080/components/population-app/`, where `seed-element` is the name of the directory containing it.
+`http://localhost:8080/components/population-app/demo/index.html`
 
 ## To install in your app
 
  `bower install https://github.com/ltg-uic/population-app.git --save`
 
 
-## Testing Your Element
-
-Simply navigate to the `/demo` directory of your element to run its tests. If
-you are using Polyserve: `http://localhost:8080/components/population-app/demo/`
