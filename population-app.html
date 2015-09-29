@@ -111,13 +111,13 @@
     </style>
     <template>
 
-        <nutella-connector connected={{connected}} id="nutellaConn" host="127.0.0.1" appid="wallcology" runid="default"
+        <nutella-connector connected={{connected}} id="nutellaConn" hostname="localhost" appid="wallcology" runid="default"
                         componentid="wallcology_admin"></nutella-connector>
 
         <div class="vertical-section-container">
             <div class="vertical-section">
                 <wallcology-selector toggle-selectors="{{toggleSelectors}}" button-selectors={{buttonSelectors}}
-                                     max-selections="2" selected-items="{{selectedItems}}"
+                                     max-selections="4" selected-items="{{selectedItems}}"
                                      current-toggle="{{currentToggle}}"></wallcology-selector>
             </div>
             <div class="vertical-section hspacer red">
@@ -257,7 +257,7 @@
                         for (var i = 0; i < this.graphs.length; i++) {
                             var g = this.graphs[i];
                             if (g.index === species.index) {
-                                this.splice('graphs', i, 1);
+                                this.splice('graphs', i);
                             }
                         }
 
