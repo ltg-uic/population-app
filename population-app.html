@@ -196,8 +196,6 @@
                     value: {
                         legend: {position: 'none'},
                         viewWindow: {
-                            min: new Date(2014, 11, 31, 18),
-                            max: new Date(2015, 0, 3, 1)
                         },
                         hAxis: {
                             gridlines: {
@@ -369,8 +367,8 @@
                                 found = true;
                                 g.data = t;
                                 g.options = me.chartOptions;
-                                g.options.viewWindow.min = t[1][0];
-                                g.options.viewWindow.max = t[t.length-1][0];
+//                                g.options.viewWindow.min = t[1][0];
+//                                g.options.viewWindow.max = t[t.length-1][0];
                                 me.redrawChart(g.index);
                                 console.log('updated graph')
                             }
