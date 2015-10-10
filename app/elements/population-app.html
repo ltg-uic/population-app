@@ -83,6 +83,15 @@
           margin: 0px;
         @apply(--shadow-elevation-0dp);
         }
+
+        .item {
+        @apply(--layout-horizontal);
+          margin: 16px 16px 0 16px;
+          padding: 20px;
+          border-radius: 8px;
+          background-color: blue;
+          border: 1px solid #ddd;
+        }
     </style>
     <template>
 
@@ -90,10 +99,10 @@
                            runid="default"
                            componentid="wallcology_admin"></nutella-connector>
 
-        <div class="vertical-section-container">
+        <div id='topBar' class="vertical-section-container">
             <div class="vertical-section">
                 <wallcology-selector toggle-selectors="{{toggleSelectors}}" button-selectors={{buttonSelectors}}
-                                     max-selections="4" selected-items="{{selectedItems}}"
+                                     max-selections="13" selected-items="{{selectedItems}}"
                                      current-toggle="{{currentToggle}}"></wallcology-selector>
             </div>
             <div class="vertical-section hspacer">
@@ -101,29 +110,38 @@
             </div>
         </div>
 
+      <iron-list items="[[graphs]]" as="item">
+        <template>
+          <div>
+            <div class="item">
+              dfdfdf
+            </div>
+          </div>
+        </template>
+      </iron-list>
 
-        <div class="vertical-section-container">
-            <template is="dom-repeat" items="{{graphs}}">
-                <div class="vertical-section center">
+        <!--<div class="vertical-section-container">-->
+            <!--<template is="dom-repeat" items="{{graphs}}">-->
+                <!--<div class="vertical-section center">-->
 
-                    <div class="horizontal layout center">
-                        <div class="nopadding2">
-                        <paper-icon-button toggles disabled on-tap="buttonTapped" src="{{item.imgUrl}}"
-                                           class="bug nopadding"></paper-icon-button>
-                        </div>
-                        <div class="center flex righpadding">
-                            <google-chart auto-fit-on-attach id="{{chartName(item.index)}}"
-                                          type='column'
-                                          options='{{item.options}}'
-                                          data={{item.data}}>
-                            </google-chart>
+                    <!--<div class="horizontal layout center">-->
+                        <!--<div class="nopadding2">-->
+                        <!--<paper-icon-button toggles disabled on-tap="buttonTapped" src="{{item.imgUrl}}"-->
+                                           <!--class="bug nopadding"></paper-icon-button>-->
+                        <!--</div>-->
+                        <!--<div class="center flex righpadding">-->
+                            <!--<google-chart auto-fit-on-attach id="{{chartName(item.index)}}"-->
+                                          <!--type='column'-->
+                                          <!--options='{{item.options}}'-->
+                                          <!--data={{item.data}}>-->
+                            <!--</google-chart>-->
 
-                        </div>
-                    </div>
+                        <!--</div>-->
+                    <!--</div>-->
 
-                </div>
-            </template>
-        </div>
+                <!--</div>-->
+            <!--</template>-->
+        <!--</div>-->
 
         <div class="vertical-section-container">
             <div class="vertical-section center">
@@ -552,6 +570,7 @@
                 this.toggleSelectors = [];
                 this.graphs = [];
                 this.envGraphs = [];
+               console.log('top size', this.$.topBar.height);
 
             },
             chartName: function (index) {
