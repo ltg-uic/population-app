@@ -4,77 +4,18 @@
 </head>
 
 <dom-module id="population-app">
-  <style include="shared-styles"></style>
-    <style>
+    <template>
+      <style include="shared-styles"></style>
+      <style>
         :host {
         }
 
         google-chart {
-            height: 150px;
-            width: 100%;
-            background-color: #ffffff;
-            padding: 0px;
-            margin: 0px;
-        }
-
-
-        .bugspacer {
-            --iron-icon-height: 60px;
-            --iron-icon-width: 60px;
-        }
-
-        .dateSpacer {
-            height: 80px;
-            width: 80px;
-        }
-
-        .leftspacer {
-            margin-left: 45px;
-        }
-
-        .rightspacer {
-            margin-right: 20px;
-        }
-
-        .rightpadder {
-            padding-right: 40px;
-        }
-        .nopadding {
-            padding: 0px;
-            margin: 0px;
-        }
-        .nopadding2 {
-            padding: 0px;
-            margin-left: 5px;
-        }
-
-        .startdateSpacer {
-            padding: 0px;
-            margin: 200px;
-            width: 0px;
-        }
-
-        .vertical-section-container {
-        @apply(--layout-vertical);
-        @apply(--center-justified);
-        }
-
-        .horizontal-section-container {
-        @apply(--layout-horizontal);
-        @apply(--layout-center-justified);
-        @apply(--layout-wrap);
-        }
-
-        .horizontal-section {
-          background-color: white;
+          height: 150px;
+          width: 100%;
+          background-color: #ffffff;
           padding: 0px;
-          margin: 0 0px 0px 0px;
-        }
-
-        .vertical-section {
-          background-color: white;
-          padding: 0px;
-          margin: 0 0px 0px 0px;
+          margin: 0px;
         }
 
         paper-button.colorful {
@@ -84,16 +25,43 @@
         @apply(--shadow-elevation-0dp);
         }
 
-        .item {
-        @apply(--layout-horizontal);
-          margin: 16px 16px 0 16px;
-          padding: 20px;
-          border-radius: 8px;
-          background-color: blue;
-          border: 1px solid #ddd;
+        iron-icon {
+          width: 60px;
+          height: 60px;
+          margin-left: 5px;
         }
-    </style>
-    <template>
+
+        .dateSpacer {
+          height: 80px;
+          width: 80px;
+          padding: 0px;
+          margin: 0px;
+        }
+
+
+        .leftspacer {
+          margin-left: 70px;
+        }
+
+        .rightspacer {
+          margin-right: 30px;
+        }
+
+        .rightpadder {
+          margin-right: 0px;
+        }
+        .nopadding {
+          padding: 0px;
+          margin: 0px;
+        }
+
+        .startdateSpacer {
+          padding: 0px;
+          margin: 200px;
+          width: 0px;
+        }
+
+      </style>
 
         <nutella-connector connected={{connected}} id="nutellaConn" hostname="ltg.evl.uic.edu" appid="wallcology"
                            runid="default"
@@ -101,56 +69,49 @@
 
         <div id='topBar' class="vertical-section-container">
             <div class="vertical-section">
+              <div class="horizontal-section-container">
+
+                <div class="horizontal-section">
                 <wallcology-selector toggle-selectors="{{toggleSelectors}}" button-selectors={{buttonSelectors}}
                                      max-selections="13" selected-items="{{selectedItems}}"
                                      current-toggle="{{currentToggle}}"></wallcology-selector>
+                  </div>
+                </div>
             </div>
             <div class="vertical-section hspacer">
 
             </div>
         </div>
 
-      <iron-list items="[[graphs]]" as="item">
-        <template>
-          <div>
-            <div class="item">
-              dfdfdf
-            </div>
-          </div>
-        </template>
-      </iron-list>
+        <div class="vertical-section-container">
+            <template is="dom-repeat" items="{{graphs}}">
+                <div class="vertical-section center">
 
-        <!--<div class="vertical-section-container">-->
-            <!--<template is="dom-repeat" items="{{graphs}}">-->
-                <!--<div class="vertical-section center">-->
+                    <div class="horizontal layout center">
 
-                    <!--<div class="horizontal layout center">-->
-                        <!--<div class="nopadding2">-->
-                        <!--<paper-icon-button toggles disabled on-tap="buttonTapped" src="{{item.imgUrl}}"-->
-                                           <!--class="bug nopadding"></paper-icon-button>-->
-                        <!--</div>-->
-                        <!--<div class="center flex righpadding">-->
-                            <!--<google-chart auto-fit-on-attach id="{{chartName(item.index)}}"-->
-                                          <!--type='column'-->
-                                          <!--options='{{item.options}}'-->
-                                          <!--data={{item.data}}>-->
-                            <!--</google-chart>-->
+                        <iron-icon src="{{item.imgUrl}}"
+                                           class="graphIcon" style="width: 60px;"></iron-icon>
 
-                        <!--</div>-->
-                    <!--</div>-->
+                        <div class="center flex rightpadder">
+                            <google-chart auto-fit-on-attach id="{{chartName(item.index)}}"
+                                          type='column'
+                                          options='{{item.options}}'
+                                          data={{item.data}}>
+                            </google-chart>
 
-                <!--</div>-->
-            <!--</template>-->
-        <!--</div>-->
+                        </div>
+                    </div>
+
+                </div>
+            </template>
+        </div>
 
         <div class="vertical-section-container">
             <div class="vertical-section center">
 
-                <div class="horizontal layout">
-                    <div class="datespacer">
-                    <paper-icon-button disabled on-tap="buttonTapped" src="" class="bugspacer">
-                                       </paper-icon-button>
-                    </div>
+                <div class="horizontal layout red">
+                    <div style="
+    width:  100px;"></div>
                     <div class="left">
                         <paper-button id="startDateButton" on-tap="showStartDateDialogAction" class="colorful"><span>{{formatButtonDate(startDate)}}</span>
                         </paper-button>
@@ -242,21 +203,24 @@
                             trigger: 'none'
                         },
                         viewWindow: {},
-                        chartArea: {left: 40, top: 10, right: 30, bottom: 0, width: '94%', height: '80%'},
+                        enableInteractivity: false,
+                        animation: {
+                          "startup": true, duration: 2000,
+                          easing: 'inAndOut'},
+                        chartArea: {left: 35, top: 10, right: 0, bottom: 10, width: '93%', height: '75%'},
                         hAxis: {
                             gridlines: {
                                 count: -1,
                                 units: {
-                                    days: {format: ['MMM d']},
-                                    hours: {format: ['hh:mm', 'ha']},
-                                    minutes: {format: ['hh:mm a', ':mm']}
+                                    days: {format: ['M/d']},
+                                    hours: {format: ['hh:mm a']},
 
                                 }
                             },
                             minorGridlines: {
                                 units: {
-                                    hours: {format: ['hh:mm a', 'ha']},
-                                    minutes: {format: ['hh:mm a', ':mm']}
+                                    hours: {format: ['hh:mm a']},
+                                    minutes: {format: ['hh:mm a']}
                                 }
                             }
                         }
@@ -454,6 +418,8 @@
             addHistoryGraph: function (species, habitatIndex, sdate, edate, message, type) {
                 var me = this;
                 var messageType = type;
+                var sDateLocal = sdate;
+                var eDateLocal = edate;
                 console.log(JSON.stringify(message));
                 this.$.nutellaConn.nutella.net.request(type, message, function (response) {
                     var r = response;
@@ -461,18 +427,27 @@
                     if(r.length > 0 ) {
                         var t = [
 
-                            [{label: 'Days', type: 'date'}, {label: 'Counts', type: 'number'}]
+                            [{label: 'Days', type: 'date'}, {label: 'Counts', type: 'number'},  {type:'string', role:'style'}]
 
 
                         ];
-                        if (messageType === 'environment_history') {
+                      var firstDate = 'Date(' +  moment(sDateLocal).subtract(1,'minute').valueOf() + ')';
+                      //add one minute to the start time and set it 0
+                      t.push([firstDate, 0, species.color]);
+
+
+                      console.log('spieces color: ', species.color);
+                      if (messageType === 'environment_history') {
                             if (species.index === 0) {
                                 species.index = 11;
                             } else if (species.index === 1) {
                                 species.index = 12;
-//                            } else if (species.index === 2) {
+                            } else if (species.index === 2) {
                                 species.index = 13;
                             }
+
+
+
                             for (var i1 = 0; i1 < r.length; i1++) {
                                 //t.push([r[i].timestamp, r[i].population]);
                                 // var d = moment("/Date(" + r[i].timestamp + ")/").isocalendar();
@@ -481,11 +456,15 @@
 
                                 console.log('ENV date', moment(r[i1].timestamp).valueOf());
 
-                                t.push([d1, r[i1].value]);
+                                t.push([d1, r[i1].value, species.color]);
 
 
                             }
-                            me.drawGraph(species,t,'environment_history', sdate, edate);
+                        var lastDate = 'Date(' +  moment(eDateLocal).add(2,'minute').valueOf() + ')';
+                        //add one minute to the start time and set it 0
+                        t.push([lastDate, 0, species.color]);
+
+                        me.drawGraph(species,t,'environment_history', sdate, edate);
                         } else if (messageType === 'population_history') {
                             for (var i2 = 0; i2 < r.length; i2++) {
                                 var d2 = 'Date(' +  moment(r[i2].timestamp).valueOf() + ')';
@@ -493,12 +472,18 @@
                                 if (r[i2] === null) {
                                     console.log('null population at: ', i2);
                                 }
-                                t.push([d2, r[i2].population]);
+                                t.push([d2, r[i2].population, species.color]);
                             }
 
-                            me.drawGraph(species,t,'population_history', sdate, edate);
+                        var lastDate = 'Date(' +  moment(eDateLocal).add(2,'minute').valueOf() + ')';
+                        //add one minute to the start time and set it 0
+                        t.push([lastDate, 0, species.color]);
+
+                        me.drawGraph(species,t,'population_history', sdate, edate);
 
                         }
+
+
                     } else {
                         this.showAlert('The query return 0 results');
                     }
@@ -511,25 +496,27 @@
                     return (el.index === species.index);
                 });
 
+                var min = new Date(moment(from).subtract(1,'minute').valueOf());
+                var max = new Date(moment(to).add(1,'minute').valueOf());
                 //previous
                 if( foundGraphs.length > 0 ) {
                     var oldGraph = foundGraphs[0];
                     oldGraph.data = data;
                     oldGraph.options = this.chartOptions;
-                    oldGraph.options.hAxis.minValue = new Date(moment(from).valueOf());
-                    oldGraph.options.hAxis.maxValue = new Date(moment(to).valueOf());
-                    oldGraph.options.viewWindow.min = new Date(moment(from).valueOf());
-                    oldGraph.options.viewWindow.max = new Date(moment(to).valueOf());
+                    oldGraph.options.hAxis.minValue = min;
+                    oldGraph.options.hAxis.maxValue = max;
+                    oldGraph.options.viewWindow.min = min;
+                    oldGraph.options.viewWindow.max = max;
                     this.notifyPath('graphs.data', this.graphs);
                     this.redrawChart(oldGraph);
                     console.log('updated graph');
                 } else {
                     var g = {index: species.index, data: data, imgUrl: species.imgUrl};
                     g.options = this.chartOptions;
-                    g.options.hAxis.minValue = new Date(moment(from).valueOf());
-                    g.options.hAxis.maxValue = new Date(moment(to).valueOf());
-                    g.options.viewWindow.min = new Date(moment(from).valueOf());
-                    g.options.viewWindow.max = new Date(moment(to).valueOf());
+                    g.options.hAxis.minValue = min;
+                    g.options.hAxis.maxValue = max;
+                    g.options.viewWindow.min = min;
+                    g.options.viewWindow.max = max;
                     this.push('graphs', g);
                     console.log('pushed graph');
                 }
@@ -569,8 +556,6 @@
                 this.buttonSelectors = [];
                 this.toggleSelectors = [];
                 this.graphs = [];
-                this.envGraphs = [];
-               console.log('top size', this.$.topBar.height);
 
             },
             chartName: function (index) {

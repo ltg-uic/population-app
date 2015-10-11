@@ -1,5 +1,5 @@
 {
-  "name": "polymer-starter-kit",
+  "name": "population-app",
   "private": true,
   "dependencies": {
     "polymer": "Polymer/polymer#^1.1.0",
