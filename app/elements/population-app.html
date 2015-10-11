@@ -89,8 +89,7 @@
 
                     <div class="horizontal layout center">
 
-                        <iron-icon src="{{item.imgUrl}}"
-                                           class="graphIcon" style="width: 60px;"></iron-icon>
+                        <iron-icon src="{{item.imgUrl}}" style="width: 60px;"></iron-icon>
 
                         <div class="center flex rightpadder">
                             <google-chart auto-fit-on-attach id="{{chartName(item.index)}}"
@@ -279,7 +278,7 @@
                         for (var i = 0; i < this.graphs.length; i++) {
                             var g = this.graphs[i];
                             if (g.index === s.index) {
-                                this.splice('graphs', i);
+                                this.splice('graphs', i, 1);
                             }
                         }
 
