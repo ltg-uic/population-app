@@ -63,7 +63,7 @@
 
     </style>
 
-    <nutella-connector connected={{connected}} id="nutellaConn" hostname="ltg.evl.uic.edu" appid="wallcology"
+    <nutella-connector connected={{connected}} id="nutellaConn" hostname="localhost" appid="wallcology"
                        runid="default"
                        componentid="wallcology_admin"></nutella-connector>
 
@@ -189,7 +189,7 @@
           notify: true,
           value: []
         },
-        envGraphs: {
+        envEventHistories: {
           type: Array,
           notify: true,
           value: []
@@ -275,6 +275,7 @@
             } else {
               this.updateGraph(species, 'population_history');
             }
+            //this.updateEventHistoryPoints();
           } else if (is.removed[0] !== undefined) {
             var s = is.removed[0];
             for (var i = 0; i < this.graphs.length; i++) {
@@ -301,10 +302,10 @@
         this.set('selectedItems',[]);
         this.clearAllGraphs();
       },
-      showStartDateDialogAction: function (e) {
+      showStartDateDialogAction: function () {
         this.$.startDateDialog.toggle();
       },
-      showEndDateDialogAction: function (e) {
+      showEndDateDialogAction: function () {
         this.$.endDateDialog.toggle();
       },
       formatButtonDate: function (someDate) {
@@ -318,14 +319,22 @@
             if (this.checkDatesValid()) {
               this.startDate = this.$.startDatePicker.date;
               this.updateAllGraphs();
+//              this.updateEventHistoryPoints();
+            } else {
+              this.showStartDateDialogAction();
             }
           } else if (e.target.id === 'endDateDialog') {
             if (this.checkDatesValid()) {
               this.endDate = this.$.endDatePicker.date;
               this.updateAllGraphs();
+//              this.updateEventHistoryPoints();
+            } else {
+              this.showEndDateDialogAction();
             }
 
           }
+
+
         }
         console.log('dismissed', e);
       },
@@ -334,13 +343,10 @@
         if (moment(this.startDate).isSame(this.endDate)) {
           return true;
         } else if (moment(this.startDate).isAfter(this.endDate)) {
-          this.showAlert('Start Date: ' + moment(this.startDate).format(this.pickerDateFormat) + ' cannot come after End Date: ' + moment(this.endDate).format(this.pickerDateFormat));
           return false;
         } else if (moment(this.endDate).isBefore(this.startDate)) {
-          this.showAlert('End Date: ' + moment(this.endDate).format(this.pickerDateFormat) + ' cannot come before Start Date: ' + moment(this.startDate).format(this.pickerDateFormat));
           return false;
         } else if (moment(this.endDate).isAfter(new Date())) {
-          this.showAlert('Time travel to the future is not allowed');
           return false;
         } else {
           return true;
@@ -371,6 +377,15 @@
       },
       clearAllGraphs: function() {
         this.set('graphs',[]);
+        this.set('envEventHistories',[]);
+      },
+      updateEventHistoryPoints: function () {
+        var sdate = moment(this.startDate).startOf('day').valueOf();
+        var edate = moment(this.endDate).endOf('day').valueOf();
+        var habitatIndex = this.currentToggle.index;
+        var message = {habitat: habitatIndex, from: sdate, to: edate};
+
+        this.addEventHistoryPoints(habitatIndex, sdate, edate, message);
       },
       updateGraph: function (species, type) {
         var sdate = moment(this.startDate).startOf('day').valueOf();
@@ -411,9 +426,34 @@
 
         }
       },
-
-      addEnvGraph: function (env, habitatIndex, sdate, edate) {
+      addEventHistoryPoints: function (habitatIndex, sdate, edate, message) {
         var me = this;
+        var sDateLocal = sdate;
+        var eDateLocal = edate;
+        console.log('MESSAGE FOR ENV EVENTS: ' + JSON.stringify(message));
+        this.$.nutellaConn.nutella.net.request('environmental_events_history', message, function (response) {
+          var r = response;
+          console.log('EVENTS Response: ', r);
+
+          if (r.length > 0) {
+
+
+          } else {
+            //zero results
+            var firstEnvPoint = 'Date(' + moment(sDateLocal).subtract(1, 'minute').valueOf() + ')';
+            //add one minute to the start time and set it 0
+            t.push([firstDate, 0, species.color]);
+
+            var lastEnvPoint = 'Date(' + moment(eDateLocal).add(2, 'minute').valueOf() + ')';
+            //add one minute to the start time and set it 0
+            t.push([lastDate2, 0, species.color]);
+
+            //me.drawGraph(species, t, messageType, sdate, edate);
+
+          }
+        });
+
+
 
       },
       addHistoryGraph: function (species, habitatIndex, sdate, edate, message, type) {
@@ -455,7 +495,7 @@
                 var d1 = 'Date(' + moment(r[i1].timestamp).valueOf() + ')';
 
 
-                console.log('ENV date', moment(r[i1].timestamp).valueOf());
+//                console.log('ENV date', moment(r[i1].timestamp).valueOf());
 
                 t.push([d1, r[i1].value, species.color]);
 
@@ -469,7 +509,7 @@
             } else if (messageType === 'population_history') {
               for (var i2 = 0; i2 < r.length; i2++) {
                 var d2 = 'Date(' + moment(r[i2].timestamp).valueOf() + ')';
-                console.log('new date', moment(r[i2].timestamp).valueOf());
+//                console.log('new date', moment(r[i2].timestamp).valueOf());
                 if (r[i2] === null) {
                   console.log('null population at: ', i2);
                 }
@@ -487,13 +527,13 @@
 
           } else {
             //zero results
-            var firstDate = 'Date(' + moment(sDateLocal).subtract(1, 'minute').valueOf() + ')';
+            var popFirstDate = 'Date(' + moment(sDateLocal).subtract(1, 'minute').valueOf() + ')';
             //add one minute to the start time and set it 0
-            t.push([firstDate, 0, species.color]);
+            t.push([popFirstDate, 0, species.color]);
 
-            var lastDate2 = 'Date(' + moment(eDateLocal).add(2, 'minute').valueOf() + ')';
+            var popLastDate = 'Date(' + moment(eDateLocal).add(2, 'minute').valueOf() + ')';
             //add one minute to the start time and set it 0
-            t.push([lastDate2, 0, species.color]);
+            t.push([popLastDate, 0, species.color]);
 
             me.drawGraph(species, t, messageType, sdate, edate);
 
@@ -567,6 +607,7 @@
         this.buttonSelectors = [];
         this.toggleSelectors = [];
         this.graphs = [];
+        this.envEventHistories = [];
 
       },
       chartName: function (index) {
