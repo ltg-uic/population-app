@@ -12,5 +12,8 @@
     "wallcology-selector": "git://github.com/ltg-uic/wallcology-selector.git",
     "google-chart": "GoogleWebComponents/google-chart"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "web-component-tester": "*",
+    "test-fixture": "PolymerElements/test-fixture#^1.0.0"
+  }
 }
