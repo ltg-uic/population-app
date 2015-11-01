@@ -364,14 +364,14 @@
               'activeUrl': 'https://ltg.cs.uic.edu/WC/icons/env_temp_0.svg',
               'index': 11,
               'color': '#FF5722',
-              'type': 'e'
+              'type': 'et'
             },
             {
               'highlightUrl': 'https://ltg.cs.uic.edu/WC/icons/env_pipe.svg',
               'activeUrl': 'https://ltg.cs.uic.edu/WC/icons/env_pipe_0.svg',
               'index': 12,
               'color': '#795548',
-              'type': 'e'
+              'type': 'ep'
             }
           ]
         },
@@ -390,16 +390,16 @@
           notify: true,
           value: {
             legend: {position: 'none'},
-            tooltip: {
-              trigger: 'none'
-            },
+//            tooltip: {
+//              trigger: 'none'
+//            },
             viewWindow: {},
-            enableInteractivity: false,
+            enableInteractivity: true,
             animation: {
               startup: true,
               duration: 250,
-              //  easing: 'inAndOut'
-              easing: 'out'
+              easing: 'inAndOut',
+              //easing: 'out'
             },
             chartArea: {left: '5%', width: '93%', height: '75%'},
             vAxis: {
@@ -466,7 +466,7 @@
         },
         defaultR: {
           type: Number,
-          value: 0.025
+          value: 0.0
         },
         defaultH: {
           type: Number,
@@ -555,8 +555,10 @@
         } else if (type === 'p') {
           this.maxes[index].p = this.defaultP;
           return;
-        } else if (type === 'e') {
-
+        } else if (type === 'ep') {
+          this.maxes[index].ep = this.defaultE;
+        } else if (type === 'et') {
+          this.maxes[index].et = this.defaultE;
         }
       },
       toggleSelectorsChanged: function (changeRecord) {
@@ -745,6 +747,7 @@
                 t.push([d1, r[i1].value, sSpecies.color]);
               }
 
+              me.setGraphMax(sSpecies, me.findMaxValue(t));
 
               var foundENVGraphs = me.graphs.filter(function (el) {
                 return (el.index === sSpecies.index);
@@ -837,7 +840,7 @@
           //set the new max
           for (var k = 0; k < this.graphs.length; k++) {
             var b = this.graphs[k];
-            if (type === b.type) {
+            if (type === b.type && b.index === graph.index) {
 
               var textPosition = b.options.hAxis.textPosition;
               //el.options = me.chartOptions;
@@ -915,8 +918,10 @@
           if (newMax > this.maxes[index].p) {
             this.maxes[index].p = newMax;
           }
-        } else if (species.type === 'e') {
-          //this.maxes[index].e;
+        } else if (species.type === 'et') {
+          this.maxes[index].et = newMax;
+        }else if (species.type === 'ep') {
+          this.maxes[index].ep = newMax;
         }
       },
       getGraphMax: function (graph) {
@@ -928,11 +933,43 @@
           return this.maxes[index].h;
         } else if (graph.type === 'p') {
           return this.maxes[index].p;
-        } else if (graph.type === 'e') {
-          return this.maxes[index].e;
+        } else if (graph.type === 'et') {
+          return this.maxes[index].et;
+        } else if (graph.type === 'ep') {
+          return this.maxes[index].ep;
         }
       },
       updateGraphAxis: function (someGraph, type, min, max) {
+
+        //someGraph = JSON.parse(JSON.stringify(this.chartOptions));
+
+        someGraph.options.vAxis =  {
+          minValue: 0,
+            maxValue: 0.1,
+            textStyle: {
+            fontSize: 14
+          }
+        };
+
+        someGraph.options.xAxis = {
+          textPosition: 'out',
+            textStyle: {
+          fontSize: 14
+        },
+          gridlines: {
+            count: -1,
+              units: {
+              days: {format: ['M/d']},
+              hours: {format: ['h a']},
+            }
+          },
+          minorGridlines: {
+            units: {
+              hours: {format: ['h a']},
+              minutes: {format: ['h:mm a']}
+            }
+          }
+        };
 
         if (min !== undefined && max !== undefined) {
           someGraph.options.hAxis.minValue = min;
@@ -945,29 +982,36 @@
 
         var pat = '';
 
-        someGraph.options.vAxis.minValue = 0;
+
 
         console.log('V: ',v);
-        if( someGraph.type === 'p' || someGraph.type === 'r' || someGraph.type === 'h'  ) {
 
 //          Ymax <=1, show one decimal place (e.g. 0.1, 0.2, etc.) this means that
 //          for the example you show me, there would only be one label (0.1) on the y axis
 //
 //          if Ymax > 1, no decimal places.
 
-
+          var t = 0;
           if( v <= 1 ) {
 
-            if( v ===  0 || v <=  0.1 ) {
-              v = 0.1;
-              //someGraph.options.vAxis.maxValue = 0.1;
-            } else {
-              someGraph.options.vAxis.maxValue = v;
+            if( v === 0 || v <  0.1 ) {
+              t = 1.0;
+              someGraph.options.vAxis.format = '0.0';
+            } else if( v > 0.1 && v <  1){
+              t = this.round_up(v, 1.0);
+              someGraph.options.vAxis.format = '0.#';
             }
-            someGraph.options.vAxis.format = '0.#';
-            someGraph.options.vAxis.ticks = [0,v];
-            someGraph.options.vAxis.minorGridlines = {count: 3};
+            else if(v === 1){
+              t = 1.0;
+              someGraph.options.vAxis.format = '0.0';
+            }
+            someGraph.options.vAxis.maxValue = v;
 
+
+
+            someGraph.options.vAxis.ticks = [0,t];
+            someGraph.options.vAxis.minorGridlines = {count: 3};
+            //someGraph.options.vAxis.gridlines = {count: 0};
           } else if( v > 1) {
             //find how many digits we have before the decimal
             var vstring = v.toString().split('.')[0];
@@ -978,11 +1022,14 @@
               pat = pat + '#';
             }
             console.log('NUM PATTER: ' + pat);
+            t = Math.ceil(v);
             someGraph.options.vAxis.format = pat;
             someGraph.options.vAxis.maxValue = v;
+           // someGraph.options.vAxis.minorGridlines = {count: 3};
+           // someGraph.options.vAxis.majorGridlines = {count: 5};
           }
 
-        }
+
 
         if (someGraph !== undefined) {
           switch (type) {
@@ -1004,6 +1051,13 @@
           }
         }
 
+      },
+      round_up: function(val, precision) {
+      power = Math.pow (10, precision);
+      poweredVal = Math.ceil (val * power);
+      result = poweredVal / power;
+
+        return result;
       },
       redrawChart: function (graph) {
         var chartId = this.chartName(graph.index);
@@ -1029,12 +1083,16 @@
           'index': -1
         }];
         this.toggleSelectors = start.concat(this.toggleSelectors);
-        this.maxes = [{r: this.defaultR, h: this.defaultH, p: this.defaultP, e: this.defaultE}, {r: this.defaultR, h: this.defaultH, p: this.defaultP, e: this.defaultE}, {
+        this.maxes = [{r: this.defaultR, h: this.defaultH, p: this.defaultP,  et: this.defaultE,
+          ep: this.defaultE}, {r: this.defaultR, h: this.defaultH, p: this.defaultP,  et: this.defaultE,
+          ep: this.defaultE}, {
           r: this.defaultR,
           h: this.defaultH,
           p: this.defaultP,
-          e: this.defaultE,
-        }, {r: this.defaultR, h: this.defaultH, p: this.defaultP, e: this.defaultE}];
+          et: this.defaultE,
+          ep: this.defaultE
+        }, {r: this.defaultR, h: this.defaultH, p: this.defaultP,  et: this.defaultE,
+          ep: this.defaultE}];
       },
       chartName: function (index) {
         console.log('graph ' + index);
