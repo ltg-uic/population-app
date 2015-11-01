@@ -717,6 +717,8 @@
 
       },
       addHistoryGraph: function (species, habitatIndex, sdate, edate, message, type) {
+        var b = this.$.ws.getAllButtons();
+        b[species.index].disabled = true;
         var me = this;
         var messageType = type;
         var sDateLocal = sdate;
@@ -731,10 +733,13 @@
           ];
 
 
+
+
           var min = new Date(moment(sdate).valueOf());
           var max = new Date(moment(edate).valueOf());
 
           if (r.length > 0) {
+
             //environmental_variable: 0, 0=temperature 1=pipe length 2=brick area
             if (messageType === 'environment_history') {
               if (sSpecies.index === 0) {
@@ -747,7 +752,8 @@
                 t.push([d1, r[i1].value, sSpecies.color]);
               }
 
-              me.setGraphMax(sSpecies, me.findMaxValue(t));
+              var envMax = me.findMaxValue(t);
+              me.setGraphMax(sSpecies, envMax);
 
               var foundENVGraphs = me.graphs.filter(function (el) {
                 return (el.index === sSpecies.index);
@@ -767,10 +773,16 @@
                 me.redrawChart(foundEnvGraph);
               } else {
                 //we have a new one
+                envMax = me.findMaxValue(t);
+                me.setGraphMax(sSpecies, envMax);
                 me.drawGraph(sSpecies, t, 'environment_history', sdate, edate);
               }
 
 
+              setInterval(function(){
+                var a = me.$.ws.getAllButtons();
+                a[sSpecies.index].disabled = false;
+              }, 3000);
 
 
             } else if (messageType === 'population_history') {
@@ -779,7 +791,8 @@
                 t.push([d2, r[i2].population, sSpecies.color]);
               }
 
-              me.setGraphMax(sSpecies, me.findMaxValue(t));
+              var hisMax = me.findMaxValue(t);
+              me.setGraphMax(sSpecies, hisMax);
 
               var foundHISGraphs = me.graphs.filter(function (el) {
                 return (el.index === sSpecies.index);
@@ -799,8 +812,16 @@
                 me.redrawChart(foundHisGraph);
               } else {
                 //we have a new one
+                hisMax = me.findMaxValue(t);
+                me.setGraphMax(sSpecies, hisMax);
                 me.drawGraph(sSpecies, t, 'population_history', sdate, edate);
               }
+
+              setInterval(function(){
+                var c = me.$.ws.getAllButtons();
+                c[sSpecies.index].disabled = false;
+              }, 3000);
+
             }
 
 
@@ -840,7 +861,7 @@
           //set the new max
           for (var k = 0; k < this.graphs.length; k++) {
             var b = this.graphs[k];
-            if (type === b.type && b.index === graph.index) {
+            if (type === b.type && b.index !== graph.index) {
 
               var textPosition = b.options.hAxis.textPosition;
               //el.options = me.chartOptions;
