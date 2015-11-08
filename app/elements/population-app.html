@@ -6,7 +6,8 @@
     <style>
       :host {
 
-      / / datepicker --primary-background-color: white;
+        //datepicker
+        --primary-background-color: white;
       }
 
       google-chart {
@@ -78,25 +79,11 @@
         font-size: 12px;
       }
 
-      /*.habitat-selector {*/
-      /*border: 1px solid #0e4f69 !important;*/
-      /*!*left: -20px;*!*/
-      /*margin-top: 2px;*/
-      /*!*height: 40px;*!*/
-      /*background-color: #135b78 !important;*/
-      /*!*height: 40px;*!*/
-      /*!*width: 130px;*!*/
-      /*color: #fff;*/
-      /*}*/
-      /*.habitat-selector:hover {*/
-      /*background-color: #0d4d66 !important;*/
-      /*}*/
-
     </style>
 
     <section>
-      <nutella-connector connected={{connected}} id="nutellaConn" hostname="ltg.evl.uic.edu" appid="wallcology"
-                         runid="default"
+      <nutella-connector connected={{connected}} id="nutellaConn" hostname="{{brokerid}}" appid="{{appid}}"
+                         runid="{{runid}}"
                          componentid="wallcology_admin" roomcast></nutella-connector>
       <paper-toolbar>
 
@@ -502,7 +489,24 @@
         multiplier: {
           type: Boolean,
           value: false
+        },
+        runid: {
+          type: String,
+          notify: true,
+        },
+        placeid: {
+          type: String,
+          notify: true
+        },
+        brokerid: {
+          type: String,
+          notify: true
+        },
+        appid: {
+          type: String,
+          notify: true
         }
+
       },
 
       //{r: 0.025, h: 1.0, p: 1.0, e: 1.0}
@@ -517,7 +521,7 @@
           console.log('graphsChanged', changeRecord);
         }
 
-        var maxSelect = this.$.ws.maxSelections;
+        //var maxSelect = this.$.ws.maxSelections;
 
 
         //console.log('THIS SELECTED ITEMS: ' + this.graphs + ' max ' + maxSelect);
@@ -1101,12 +1105,19 @@
         var query_parameters = NUTELLA.parseURLParameters();
         console.log('query params: ', query_parameters.place);
 
-        var place = query_parameters.place;
+        //check if we have a place id either via a url or api
+        if( this.placeid === undefined ) {
+          var place = query_parameters.place;
 
-        if (place !== undefined && place === 'to') {
+          if (place !== undefined && place === 'to') {
+            console.log('WE ARE TORONTO');
+            this.multiplier = true;
+          }
+        } else if( this.placeid === 'to') {
           console.log('WE ARE TORONTO');
           this.multiplier = true;
         }
+
 
 
         this.startDate = new Date();
