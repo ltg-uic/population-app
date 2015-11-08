@@ -105,7 +105,7 @@
 
             <div class="horizontal-section">
               <wallcology-selector id="ws" toggle-selectors="{{toggleSelectors}}" button-selectors="{{buttonSelectors}}"
-                                   max-selections="4" selected-items="{{selectedItems}}"
+                                   max-selections="{{maxSelections}}" selected-items="{{selectedItems}}"
                                    current-toggle="{{currentToggle}}"></wallcology-selector>
 
             </div>
@@ -165,14 +165,6 @@
           <paper-button dialog-confirm autofocus>OK</paper-button>
         </div>
       </paper-dialog>
-
-      <!--<paper-dialog id="modal" modal>-->
-      <!--<p>{{alertMessage}}</p>-->
-
-      <!--<div class="buttons">-->
-      <!--<paper-button dialog-confirm autofocus>OK</paper-button>-->
-      <!--</div>-->
-      <!--</paper-dialog>-->
 
     </section>
   </template>
@@ -505,6 +497,10 @@
         appid: {
           type: String,
           notify: true
+        },
+        maxSelections: {
+          type: Number,
+          notify: true
         }
 
       },
@@ -534,12 +530,9 @@
       },
       selectedItemsChanged: function (changeRecord) {
 
-        var maxSelect = this.$.ws.maxSelections;
+        console.log('MAX SELECTIONS: ' + this.maxSelections);
 
-
-        //console.log('THIS SELECTED ITEMS: ' + this.selectedItems + ' max ' + maxSelect);
-
-        if (this.selectedItems.length > maxSelect) {
+        if (this.selectedItems.length > this.maxSelections) {
           alert('HEY! Why are you clicking so fast! The bug counters need enough time to give you a result!\n Refresh the Page');
           return;
         }
