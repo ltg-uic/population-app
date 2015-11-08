@@ -8,9 +8,10 @@
   brokerid: specifies which nutella instance host we are. 
   appid: specifies which nutella app we are.  
   placeid: special switch to give some classes super powers * 6.
-
+  
+```
   <population-app runid="Mike" placeid="to" brokerid="foo.evl.foo.edu" appid="wallcology"></population-app>
-
+```
 
 
 ## Getting Started
